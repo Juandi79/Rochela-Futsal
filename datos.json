@@ -1,0 +1,23 @@
+{
+  "equipos": {
+    "BLANCOS": {
+      "pj": 0,
+      "pg": 0,
+      "pe": 0,
+      "pp": 0,
+      "gf": 0,
+      "gc": 0,
+      "puntos": 0
+    },
+    "OSCUROS": {
+      "pj": 0,
+      "pg": 0,
+      "pe": 0,
+      "pp": 0,
+      "gf": 0,
+      "gc": 0,
+      "puntos": 0
+    }
+  },
+  "partidos": {}
+}
