@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga Fútbol Sala</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        .formulario {
+            margin-top: 30px;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="number"] {
+            width: 60px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Liga de Fútbol Sala - BLANCOS vs OSCUROS</h1>
+
+<!-- Tabla de Clasificación -->
+<h2>Clasificación</h2>
+<table id="tablaClasificacion">
+    <thead>
+        <tr>
+            <th>Equipo</th>
+            <th>PJ</th>
+            <th>PG</th>
+            <th>PE</th>
+            <th>PP</th>
+            <th>GF</th>
+            <th>GC</th>
+            <th>DG</th>
+            <th>Puntos</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>BLANCOS</td>
+            <td id="blancos_pj">0</td>
+            <td id="blancos_pg">0</td>
+            <td id="blancos_pe">0</td>
+            <td id="blancos_pp">0</td>
+            <td id="blancos_gf">0</td>
+            <td id="blancos_gc">0</td>
+            <td id="blancos_dg">0</td>
+            <td id="blancos_puntos">0</td>
+        </tr>
+        <tr>
+            <td>OSCUROS</td>
+            <td id="oscuros_pj">0</td>
+            <td id="oscuros_pg">0</td>
+            <td id="oscuros_pe">0</td>
+            <td id="oscuros_pp">0</td>
+            <td id="oscuros_gf">0</td>
+            <td id="oscuros_gc">0</td>
+            <td id="oscuros_dg">0</td>
+            <td id="oscuros_puntos">0</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Calendario de Partidos -->
+<h2>Calendario de Partidos</h2>
+<ul id="calendario"></ul>
+
+<!-- Formulario para añadir resultados -->
+<div class="formulario">
+    <h3>Añadir Resultado</h3>
+    <form id="formularioResultados">
+        <label for="fechaPartido">Fecha del partido:</label>
+        <select id="fechaPartido" required></select>
+
+        <label for="golesBlancos">Goles BLANCOS:</label>
+        <input type="number" id="golesBlancos" min="0" required>
+
+        <label for="golesOscuros">Goles OSCUROS:</label>
+        <input type="number" id="golesOscuros" min="0" required>
+
+        <button type="submit">Guardar Resultado</button>
+    </form>
+</div>
+
+<script>
+    // Cargar datos desde localStorage o crear nuevos si no existen
+    let equipos = JSON.parse(localStorage.getItem("equipos")) || {
+        "BLANCOS": {
+            pj: 0,
+            pg: 0,
+            pe: 0,
+            pp: 0,
+            gf: 0,
+            gc: 0,
+            puntos: 0
+        },
+        "OSCUROS": {
+            pj: 0,
+            pg: 0,
+            pe: 0,
+            pp: 0,
+            gf: 0,
+            gc: 0,
+            puntos: 0
+        }
+    };
+
+    let partidos = JSON.parse(localStorage.getItem("partidos")) || [];
+
+    function actualizarTabla() {
+        document.getElementById("blancos_pj").textContent = equipos.BLANCOS.pj;
+        document.getElementById("blancos_pg").textContent = equipos.BLANCOS.pg;
+        document.getElementById("blancos_pe").textContent = equipos.BLANCOS.pe;
+        document.getElementById("blancos_pp").textContent = equipos.BLANCOS.pp;
+        document.getElementById("blancos_gf").textContent = equipos.BLANCOS.gf;
+        document.getElementById("blancos_gc").textContent = equipos.BLANCOS.gc;
+        document.getElementById("blancos_dg").textContent = equipos.BLANCOS.gf - equipos.BLANCOS.gc;
+        document.getElementById("blancos_puntos").textContent = equipos.BLANCOS.puntos;
+
+        document.getElementById("oscuros_pj").textContent = equipos.OSCUROS.pj;
+        document.getElementById("oscuros_pg").textContent = equipos.OSCUROS.pg;
+        document.getElementById("oscuros_pe").textContent = equipos.OSCUROS.pe;
+        document.getElementById("oscuros_pp").textContent = equipos.OSCUROS.pp;
+        document.getElementById("oscuros_gf").textContent = equipos.OSCUROS.gf;
+        document.getElementById("oscuros_gc").textContent = equipos.OSCUROS.gc;
+        document.getElementById("oscuros_dg").textContent = equipos.OSCUROS.gf - equipos.OSCUROS.gc;
+        document.getElementById("oscuros_puntos").textContent = equipos.OSCUROS.puntos;
+    }
+
+    function generarCalendario() {
+        const inicio = new Date('2025-09-01');
+        const fin = new Date('2026-06-29');
+        const dias = [];
+        let fecha = new Date(inicio);
+
+        while (fecha <= fin) {
+            if (fecha.getDay() === 1) { // Lunes
+                dias.push(fecha.toISOString().split('T')[0]);
+            }
+            fecha.setDate(fecha.getDate() + 1);
+        }
+
+        const calendario = document.getElementById("calendario");
+        const select = document.getElementById("fechaPartido");
+
+        dias.forEach(dia => {
+            const li = document.createElement("li");
+            li.textContent = dia;
+            calendario.appendChild(li);
+
+            const option = document.createElement("option");
+            option.value = dia;
+            option.textContent = dia;
+            select.appendChild(option);
+        });
+
+        return dias;
+    }
+
+    function procesarResultado(fecha, golesBlancos, golesOscuros) {
+        if (partidos.includes(fecha)) {
+            alert("Ya se ha registrado un resultado para esta fecha.");
+            return;
+        }
+
+        equipos.BLANCOS.pj++;
+        equipos.OSCUROS.pj++;
+
+        equipos.BLANCOS.gf += golesBlancos;
+        equipos.OSCUROS.gf += golesOscuros;
+
+        equipos.BLANCOS.gc += golesOscuros;
+        equipos.OSCUROS.gc += golesBlancos;
+
+        if (golesBlancos > golesOscuros) {
+            equipos.BLANCOS.pg++;
+            equipos.OSCUROS.pp++;
+            equipos.BLANCOS.puntos += 3;
+        } else if (golesBlancos < golesOscuros) {
+            equipos.OSCUROS.pg++;
+            equipos.BLANCOS.pp++;
+            equipos.OSCUROS.puntos += 3;
+        } else {
+            equipos.BLANCOS.pe++;
+            equipos.OSCUROS.pe++;
+            equipos.BLANCOS.puntos += 1;
+            equipos.OSCUROS.puntos += 1;
+        }
+
+        partidos.push(fecha);
+
+        // Guardar en localStorage
+        localStorage.setItem("equipos", JSON.stringify(equipos));
+        localStorage.setItem("partidos", JSON.stringify(partidos));
+
+        actualizarTabla();
+        alert("Resultado guardado correctamente.");
+    }
+
+    document.getElementById("formularioResultados").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const fecha = document.getElementById("fechaPartido").value;
+        const golesBlancos = parseInt(document.getElementById("golesBlancos").value);
+        const golesOscuros = parseInt(document.getElementById("golesOscuros").value);
+
+        if (isNaN(golesBlancos) || isNaN(golesOscuros)) {
+            alert("Por favor introduce valores válidos para los goles.");
+            return;
+        }
+
+        procesarResultado(fecha, golesBlancos, golesOscuros);
+
+        this.reset();
+    });
+
+    // Iniciar
+    generarCalendario();
+    actualizarTabla();
+</script>
+
+</body>
+<style>html{
+ color:darkviolet;
+ font-size:25px;
+ font-weight:600;
+}
+</style><script>/*Here write your javascript code*/
+</script></html>
