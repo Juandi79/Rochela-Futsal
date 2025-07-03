@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Rochela Futsal</title>
+    <title>Rochela Futsal - Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -53,7 +53,7 @@
 </head>
 <body>
 
-<h1>Rochela Futsal</h1>
+<h1>Rochela Futsal - Admin</h1>
 
 <!-- Tabla de Clasificación -->
 <h2>Clasificación</h2>
@@ -97,7 +97,7 @@
     </tbody>
 </table>
 
-<!-- Calendario de Partidos con Resultados -->
+<!-- Calendario de Partidos -->
 <h2>Calendario de Partidos</h2>
 <ul id="calendario"></ul>
 
@@ -119,8 +119,7 @@
 </div>
 
 <script>
-    // Cargar datos desde localStorage o crear nuevos si no existen
-    let equipos = JSON.parse(localStorage.getItem("equipos")) || {
+    let equipos = {
         "BLANCOS": {
             pj: 0,
             pg: 0,
@@ -141,7 +140,16 @@
         }
     };
 
-    let partidos = JSON.parse(localStorage.getItem("partidos")) || {};
+    let partidos = {};
+
+    async function cargarDatos() {
+        const res = await fetch('datos.json?' + new Date().getTime());
+        const data = await res.json();
+        equipos = data.equipos;
+        partidos = data.partidos;
+        actualizarTabla();
+        generarCalendario();
+    }
 
     function actualizarTabla() {
         document.getElementById("blancos_pj").textContent = equipos.BLANCOS.pj;
@@ -179,6 +187,9 @@
         const calendario = document.getElementById("calendario");
         const select = document.getElementById("fechaPartido");
 
+        calendario.innerHTML = '';
+        select.innerHTML = '';
+
         dias.forEach(dia => {
             const li = document.createElement("li");
             if (partidos[dia]) {
@@ -193,11 +204,9 @@
             option.textContent = dia;
             select.appendChild(option);
         });
-
-        return dias;
     }
 
-    function procesarResultado(fecha, golesBlancos, golesOscuros) {
+    async function procesarResultado(fecha, golesBlancos, golesOscuros) {
         if (partidos[fecha]) {
             alert("Ya se ha registrado un resultado para esta fecha.");
             return;
@@ -232,13 +241,17 @@
             oscuros: golesOscuros
         };
 
-        // Guardar en localStorage
-        localStorage.setItem("equipos", JSON.stringify(equipos));
-        localStorage.setItem("partidos", JSON.stringify(partidos));
+        const datos = JSON.stringify({ equipos, partidos }, null, 2);
+        const blob = new Blob([datos], { type: 'application/json' });
+        const formData = new FormData();
+        formData.append('json', blob, 'datos.json');
+
+        // Simular envío a servidor (manualmente por ahora)
+        localStorage.setItem('datos', datos);
+        alert("Resultado guardado localmente. Sube manualmente datos.json a GitHub.");
 
         actualizarTabla();
         generarCalendario();
-        alert("Resultado guardado correctamente.");
     }
 
     document.getElementById("formularioResultados").addEventListener("submit", function(e) {
@@ -259,8 +272,7 @@
     });
 
     // Iniciar
-    generarCalendario();
-    actualizarTabla();
+    cargarDatos();
 </script>
 
 </body>
