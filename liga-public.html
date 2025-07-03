@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Liga Fútbol Sala - Solo Lectura</title>
+    <title>Rochela Futsal - PÃºblico</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -12,6 +12,7 @@
         }
         h1 {
             text-align: center;
+            color: #2c3e50;
         }
         table {
             width: 100%;
@@ -37,10 +38,10 @@
 </head>
 <body>
 
-<h1>Liga de Fútbol Sala - BLANCOS vs OSCUROS</h1>
+<h1>Rochela Futsal</h1>
 
-<!-- Tabla de Clasificación -->
-<h2>Clasificación</h2>
+<!-- Tabla de ClasificaciÃ³n -->
+<h2>ClasificaciÃ³n</h2>
 <table id="tablaClasificacion">
     <thead>
         <tr>
@@ -86,7 +87,7 @@
 <ul id="calendario"></ul>
 
 <script>
-    // Datos por defecto (se actualizarán desde la versión admin)
+    // Datos por defecto (se actualizarÃ¡n desde la versiÃ³n admin)
     let equipos = {
         "BLANCOS": {
             pj: 0,
@@ -107,6 +108,8 @@
             puntos: 0
         }
     };
+
+    let partidos = {};
 
     function actualizarTabla() {
         document.getElementById("blancos_pj").textContent = equipos.BLANCOS.pj;
@@ -145,21 +148,31 @@
 
         dias.forEach(dia => {
             const li = document.createElement("li");
-            li.textContent = dia;
+            if (partidos[dia]) {
+                li.textContent = `${dia} - BLANCOS ${partidos[dia].blancos} - OSCUROS ${partidos[dia].oscuros}`;
+            } else {
+                li.textContent = `${dia} - Pendiente`;
+            }
             calendario.appendChild(li);
         });
     }
 
-    // Iniciar
-    generarCalendario();
-    actualizarTabla();
+    async function cargarDatosRemotos() {
+        try {
+            const res = await fetch('https://webdevteacher.github.io/futbol-sala-league/equipos.json ');
+            const data = await res.json();
+            equipos = data.equipos;
+            partidos = data.partidos;
+            actualizarTabla();
+            generarCalendario();
+        } catch (err) {
+            console.error("No se pudieron cargar los datos.");
+        }
+    }
+
+    // Cargar datos online
+    cargarDatosRemotos();
 </script>
 
 </body>
-<style>html{
- color:darkviolet;
- font-size:25px;
- font-weight:600;
-}
-</style><script>/*Here write your javascript code*/
-</script></html>
+</html>
