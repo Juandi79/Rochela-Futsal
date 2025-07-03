@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <title>Rochela Futsal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liga Fútbol Sala</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,6 +12,7 @@
         }
         h1 {
             text-align: center;
+            color: #2c3e50;
         }
         table {
             width: 100%;
@@ -39,23 +40,23 @@
         button {
             margin-top: 15px;
             padding: 10px 20px;
-            background-color: #007BFF;
+            background-color: #27ae60;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #219150;
         }
     </style>
 </head>
 <body>
 
-<h1>Liga de Fútbol Sala - BLANCOS vs OSCUROS</h1>
+<h1>Rochela Futsal</h1>
 
-<!-- Tabla de Clasificación -->
-<h2>Clasificación</h2>
+<!-- Tabla de ClasificaciÃ³n -->
+<h2>ClasificaciÃ³n</h2>
 <table id="tablaClasificacion">
     <thead>
         <tr>
@@ -96,13 +97,13 @@
     </tbody>
 </table>
 
-<!-- Calendario de Partidos -->
+<!-- Calendario de Partidos con Resultados -->
 <h2>Calendario de Partidos</h2>
 <ul id="calendario"></ul>
 
-<!-- Formulario para añadir resultados -->
+<!-- Formulario para aÃ±adir resultados -->
 <div class="formulario">
-    <h3>Añadir Resultado</h3>
+    <h3>AÃ±adir Resultado</h3>
     <form id="formularioResultados">
         <label for="fechaPartido">Fecha del partido:</label>
         <select id="fechaPartido" required></select>
@@ -140,7 +141,7 @@
         }
     };
 
-    let partidos = JSON.parse(localStorage.getItem("partidos")) || [];
+    let partidos = JSON.parse(localStorage.getItem("partidos")) || {};
 
     function actualizarTabla() {
         document.getElementById("blancos_pj").textContent = equipos.BLANCOS.pj;
@@ -180,7 +181,11 @@
 
         dias.forEach(dia => {
             const li = document.createElement("li");
-            li.textContent = dia;
+            if (partidos[dia]) {
+                li.textContent = `${dia} - BLANCOS ${partidos[dia].blancos} - OSCUROS ${partidos[dia].oscuros}`;
+            } else {
+                li.textContent = `${dia} - Pendiente`;
+            }
             calendario.appendChild(li);
 
             const option = document.createElement("option");
@@ -193,7 +198,7 @@
     }
 
     function procesarResultado(fecha, golesBlancos, golesOscuros) {
-        if (partidos.includes(fecha)) {
+        if (partidos[fecha]) {
             alert("Ya se ha registrado un resultado para esta fecha.");
             return;
         }
@@ -222,13 +227,17 @@
             equipos.OSCUROS.puntos += 1;
         }
 
-        partidos.push(fecha);
+        partidos[fecha] = {
+            blancos: golesBlancos,
+            oscuros: golesOscuros
+        };
 
         // Guardar en localStorage
         localStorage.setItem("equipos", JSON.stringify(equipos));
         localStorage.setItem("partidos", JSON.stringify(partidos));
 
         actualizarTabla();
+        generarCalendario();
         alert("Resultado guardado correctamente.");
     }
 
@@ -240,7 +249,7 @@
         const golesOscuros = parseInt(document.getElementById("golesOscuros").value);
 
         if (isNaN(golesBlancos) || isNaN(golesOscuros)) {
-            alert("Por favor introduce valores válidos para los goles.");
+            alert("Por favor introduce valores vÃ¡lidos para los goles.");
             return;
         }
 
@@ -255,10 +264,4 @@
 </script>
 
 </body>
-<style>html{
- color:darkviolet;
- font-size:25px;
- font-weight:600;
-}
-</style><script>/*Here write your javascript code*/
-</script></html>
+</html>
