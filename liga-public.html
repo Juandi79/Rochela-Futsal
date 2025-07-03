@@ -87,7 +87,6 @@
 <ul id="calendario"></ul>
 
 <script>
-    // Datos por defecto (se actualizarán desde la versión admin)
     let equipos = {
         "BLANCOS": {
             pj: 0,
@@ -159,7 +158,7 @@
 
     async function cargarDatosRemotos() {
         try {
-            const res = await fetch('https://webdevteacher.github.io/futbol-sala-league/equipos.json ');
+            const res = await fetch('datos.json?' + new Date().getTime());
             const data = await res.json();
             equipos = data.equipos;
             partidos = data.partidos;
